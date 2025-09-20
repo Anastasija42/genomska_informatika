@@ -1,5 +1,4 @@
-*
 
-!projekat.ipynb
-!.gitignore
 __pycache__
+.venv
+/genomes
