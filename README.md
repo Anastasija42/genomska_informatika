@@ -1,62 +1,86 @@
-# Genomska informatika – Burrow-Wheeler transformacija i FM index
+# Genomic Informatics – Burrows-Wheeler Transform and the FM-Index
 
-Ovaj repozitorijum sadrži implementacije i analizu FM-indeksa za pretragu genoma, kao i poređenje osnovne i optimizovane verzije FM-indeksa na realnim genomskim podacima.
+This repository contains a project for the *Genomic Informatics* course at the Master's program, School of Electrical Engineering, University of Belgrade. It focuses on the **Burrows-Wheeler Transform (BWT)** and the **FM-Index**, tools for efficient indexing and string searching in genomic data.
 
-## Sadržaj
+## Repository Structure
 
-- `main.py` – Glavni skript za pokretanje analize, benchmarka i upisa rezultata.
-- `fm_index_basic.py` – Osnovna (neoptimizovana) implementacija FM-indeksa.
-- `fm_index_optimized.py` – Optimizovana implementacija FM-indeksa sa checkpoint-ovima i uzorkovanjem sufiksnog niza.
-- `genomes/` – FASTA fajlovi sa genomskim sekvencama za testiranje (npr. Coffea arabica, Mus pahari, Platypus).
-- `plots/` – Grafička analiza rezultata (PNG slike).
-- `results.csv` – Sumarni rezultati performansi za različite parametre.
-- `analysis_log.txt` – Detaljan log pretraga i rezultata.
-- `requirements.txt` – Lista Python zavisnosti.
-- `test_fm_index.py` - Skripta za testiranje klasa koristeći unittest biblioteku.
+- `main.py` – Runs analysis, benchmarks, and saves results  
+- `fm_index_basic.py` – Basic FM-Index implementation  
+- `fm_index_optimized.py` – Optimized FM-Index using checkpointing and suffix array sampling  
+- `genomes/` – Genomic sequences (FASTA files) for testing  
+- `plots/` – Performance charts and heatmaps  
+- `results.csv` – Summary of performance metrics  
+- `analysis_log.txt` – Log of all search queries and results  
+- `requirements.txt` – Python dependencies  
+- `test_fm_index.py` – Unit tests for FM-Index implementations  
 
-## Pokretanje
+## Getting Started
 
-1. Instalirajte zavisnosti:
-	```bash
-	pip install -r requirements.txt
-	```
+1.  **Install the dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-2. Pokrenite glavni skript:
-	```bash
-	python main.py
-	```
+2.  **Run the main analysis script:**
+    ```bash
+    python main.py
+    ```
 
-3. Rezultati će biti upisani u `results.csv` i `analysis_log.txt`.
+3.  Generate visualizations:
+    ```bash
+    python visualize.py
+    ```
 
-## Opis FM-indeksa
+## FM-Index Implementations
 
-FM-indeks je efikasan indeks za pretragu podnizova u velikim tekstovima (npr. genomima), baziran na Burrows-Wheeler transformaciji i sufiksnom nizu. Ovaj repozitorijum sadrži dve verzije:
+The FM-Index is built on top of the Burrows-Wheeler Transform (BWT) and supports fast substring queries in large texts like genomes. This project includes two versions:  
 
-- **Osnovni FM-indeks**: koristi punu Occ matricu i nije optimizovan za memoriju.
-- **Optimizovani FM-indeks**: koristi checkpoint-ove i uzorkovanje sufiksnog niza za značajnu uštedu memorije.
+- **Basic Implementation** – Stores the entire occurrence matrix (character counts for each position) and the full suffix array. This approach is highly memory-intensive and scales poorly with large genomes.  
 
-## Benchmark dataset-i
+- **Optimized Implementation** – Reduces memory consumption through:  
+  - **Checkpointing**: Stores character counts only at fixed intervals (e.g., every 128th position).  To find the count at any other position, it retrieves the nearest checkpoint and computes the remaining counts.  
+  - **Suffix Array Sampling**: Keeps only every *k*-th suffix array entry. Positions not directly stored are resolved using backward steps with the BWT until a sampled entry is reached.  
 
-U folderu `genomes/` nalaze se FASTA fajlovi sa realnim genomskim sekvencama. Skripta automatski testira više parametara za optimizovani FM-indeks i upisuje rezultate.
+This trade-off balances **speed and memory usage**, making the optimized version more practical for large-scale genomic analysis.
 
-## Vizualizacija
+## Benchmarking & Visualization
 
-Rezultati analize mogu se vizualizovati grafovima iz foldera `plots/`.
+The `genomes/` folder includes real genomic sequences. Benchmarks evaluate the performance of both implementations across parameters such as checkpoint intervals and sampling rates.  
 
-Primeri analize:
+The results are summarized in `results.csv` and visualized as charts and heatmaps under `plots/`, showing the trade-offs between index size (memory) and query time.  
 
-**Mus pahari:**
-
-![Analiza Mus pahari](plots/analiza_Mus_pahari.png)
-
-**Coffea arabica:**
-
-![Analiza Coffea arabica](plots/analiza_Coffea_arabica.png)
+### Example Analyses
 
 
-## Projekat
-Ovaj projekat je realizovan u okviru predmeta "Genomska informatika" na master studijama Elektrotehničkog fakulteta Univerziteta u Beogradu.
+#### *Coffea arabica*  
+**Average Search Time**
+![Coffea arabica Analysis](plots/analysis_Coffea_arabica.png)  
+**By pattern:**
+![Coffea arabica Analysis](plots/pattern_comparison_Coffea_arabica.png) 
 
-Studenti:
-- Teodora Srećkovič 24/3
-- Anastasija Rakić 24/3105
+#### *Mus pahari*  
+**Average Search Time**
+![Mus pahari Analysis](plots/analysis_Mus_pahari.png)  
+**By pattern:**
+![Mus pahari Analysis](plots/pattern_comparison_Mus_pahari.png)
+
+#### *Platypus*  
+**Average Search Time**
+![Platypus Analysis](plots/analysis_Platypus.png)  
+**By pattern:**
+![Platypus Analysis](plots/pattern_comparison_Platypus.png)
+
+
+---
+
+## References
+
+- Burrows, M., & Wheeler, D. J. (1994). *A block-sorting lossless data compression algorithm*. Digital Equipment Corporation. [Link](https://web.archive.org/web/20060427023016/http://www.hpl.hp.com/techreports/Compaq-DEC/SRC-RR-124.pdf)  
+- Ferragina, P., & Manzini, G. (2000). *Opportunistic data structures with applications*. In *FOCS 2000*. IEEE. [Link](https://people.unipmn.it/manzini/papers/focs00draft.pdf)  
+
+---
+
+## Students 
+- Tedora Srećković 2024/3250
+- Anastasija Rakić 2024/3105
+

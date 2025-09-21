@@ -1,4 +1,5 @@
 from pydivsufsort import divsufsort
+import collections
 
 class FMIndexBasic:
     def __init__(self, text):
@@ -7,27 +8,27 @@ class FMIndexBasic:
         self.text = text
         n = len(text)
 
-        print(f"  1. Sufiksni Niz za tekst dužine {n}...")
+        print(f"  1. Suffix Array for text of length {n}...")
         sa = divsufsort(text)
-        print("  Sufiksni Niz napravljen. Generisanje BWT...")
+        print("  Suffix Array created. Generating BWT...")
         self.bwt = "".join([text[sa[i] - 1] for i in range(n)])
         self.suffix_array = sa
-        print("  BWT kreiran.")
+        print("  BWT created.")
 
-        self.counts = {char: self.bwt.count(char) for char in set(self.bwt)}
+        self.counts = collections.Counter(self.bwt)
 
-        print("  2. Kreiranje 'First Occurrence' tabele...")
+        print("  2. Creating 'First Occurrence' table...")
         first_col = sorted(self.text)
         self.first_occurrence = {char: first_col.index(char) for char in sorted(set(self.text))}
 
-        print("  3. Kreiranje pune 'Occurrence' matrice...")
+        print("  3. Creating full 'Occurrence' matrix...")
         self.occ_matrix = self._create_occ_matrix()
-        print("Osnovni FM-indeks je uspešno napravljen.")
+        print("Basic FM-index has been successfully created.")
 
     def _create_occ_matrix(self):
         """
-        Kreira i vraća kompletnu Occ matricu.
-        Ovo je memorijski i vremenski neefikasno.
+        Creates and returns the complete Occ matrix.
+        This is memory and time inefficient.
         """
         occ = {char: [0] * (len(self.bwt) + 1) for char in self.text}
         for i, char in enumerate(self.bwt):
@@ -38,7 +39,7 @@ class FMIndexBasic:
 
     def query(self, pattern):
         """
-        Vrši 'backward search' koristeći pune matrice.
+        Performs 'backward search' using full matrices.
         """
         if not pattern:
             return 0, []

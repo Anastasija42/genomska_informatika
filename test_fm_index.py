@@ -5,68 +5,72 @@ from fm_index_optimized import FMIndexOptimized
 TEST_TEXT = "abra_cadabra_abra_cadabra$"
 
 class BaseFMIndexTests:
+    """
+    Base class for FM-Index tests.
+    Subclasses must define FMIndexClass.
+    """
     FMIndexClass = None
     fm_index = None
 
     @classmethod
     def setUpClass(cls):
         """
-        Ova metoda se poziva JEDNOM pre svih testova.
-        unittest runner će je pozvati automatski.
+        This method is called ONCE before all tests in the class.
+        The unittest runner will call it automatically.
         """
         if cls is BaseFMIndexTests:
-            raise unittest.SkipTest("Preskakanje bazne test klase")
+            raise unittest.SkipTest("Skipping base test class")
 
         if not cls.FMIndexClass:
-            raise TypeError("FMIndexClass mora biti definisan u podklasi.")
+            raise TypeError("FMIndexClass must be defined in the subclass.")
 
-        print(f"\n--- Kreiranje indeks za testiranje klase: {cls.FMIndexClass.__name__} ---")
+        print(f"\n--- Creating index for testing class: {cls.FMIndexClass.__name__} ---")
         cls.fm_index = cls.FMIndexClass(TEST_TEXT)
 
     def test_pattern_found_multiple_times(self):
-        """Testira patern koji se pojavljuje više puta."""
+        """Tests a pattern that appears multiple times."""
         pattern = "abra"
         expected_locations = [0, 8, 13, 21]
         num_matches, locations = self.fm_index.query(pattern)
         self.assertEqual(num_matches, len(expected_locations))
-        self.assertCountEqual(locations, expected_locations, "Lokacije za 'abra' se ne poklapaju")
+        self.assertCountEqual(locations, expected_locations, "Locations for 'abra' do not match")
 
     def test_pattern_found_once(self):
-        """Testira patern koji se pojavljuje tačno jednom."""
+        """Tests a pattern that appears exactly once."""
         pattern = "_cadabra$"
         expected_locations = [17]
         num_matches, locations = self.fm_index.query(pattern)
         self.assertEqual(num_matches, len(expected_locations))
-        self.assertCountEqual(locations, expected_locations, "Lokacije za '_cadabra$' se ne poklapaju")
+        self.assertCountEqual(locations, expected_locations, "Locations for '_cadabra$' do not match")
 
     def test_pattern_not_found(self):
-        """Testira patern koji ne postoji u tekstu."""
+        """Tests a pattern that does not exist in the text."""
         pattern = "CAT"
         num_matches, locations = self.fm_index.query(pattern)
         self.assertEqual(num_matches, 0)
-        self.assertEqual(len(locations), 0, "Pronađen je nepostojeći patern 'CAT'")
+        self.assertEqual(len(locations), 0, "A non-existent pattern 'CAT' was found")
 
     def test_pattern_is_single_character(self):
-        """Testira pretragu jednog karaktera."""
+        """Tests the search for a single character."""
         pattern = "c"
         expected_locations = [5, 18]
         num_matches, locations = self.fm_index.query(pattern)
         self.assertEqual(num_matches, len(expected_locations))
-        self.assertCountEqual(locations, expected_locations, "Lokacije za 'c' se ne poklapaju")
+        self.assertCountEqual(locations, expected_locations, "Locations for 'c' do not match")
 
     def test_pattern_with_invalid_character(self):
-        """Testira patern koji sadrži karakter kog nema u tekstu."""
+        """Tests a pattern containing a character not present in the text."""
         pattern = "abXra"
         num_matches, locations = self.fm_index.query(pattern)
         self.assertEqual(num_matches, 0)
-        self.assertEqual(len(locations), 0, "Pronađen je patern sa nepostojećim karakterom 'X'")
+        self.assertEqual(len(locations), 0, "A pattern with a non-existent character 'X' was found")
 
 class TestFMIndexBasic(BaseFMIndexTests, unittest.TestCase):
-    """Pokreće sve testove iz BaseFMIndexTests nad FMIndexBasic klasom."""
+    """Runs all tests from BaseFMIndexTests on the FMIndexBasic class."""
     FMIndexClass = FMIndexBasic
 
 class TestFMIndexOptimized(BaseFMIndexTests, unittest.TestCase):
-    """Pokreće sve testove iz BaseFMIndexTests nad FMIndexOptimized klasom."""
+    """Runs all tests from BaseFMIndexTests on the FMIndexOptimized class."""
     FMIndexClass = FMIndexOptimized
 
 if __name__ == '__main__':
